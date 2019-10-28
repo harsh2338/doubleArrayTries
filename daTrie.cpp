@@ -20,22 +20,25 @@ class DoubleArrayTrie
     }
 
     void a_insert(int r,string s){
+        vector<int> a = string_to_vec(s);
         int i = 0;
         int t = base[r] + code(s[i]);
 
-        if(check[t] == 0){
-
-        }
-        else{
+        if(check[t] != 0){
             int k = check[t];
             vector<int> r_list = set_list(r);
             vector<int> k_list = set_list(k);
 
             if(r_list.size() + 1 < k_list.size()){
-
+                modify(r,r,a,r_list);
+            }
+            else{
+                vector<int> null;
+                modify(r,k,null,k_list);
             }
         }
         
+        //ins_str(r,a,pos);
     }
 
     //helper functions here
@@ -44,6 +47,13 @@ class DoubleArrayTrie
         return c - 96;  
     }
 
+    vector<int> string_to_vec(string s){
+        vector<int> v;
+        for(int i = 0;i < s.length();i++){
+            v.push_back(code(s[i]));
+        }
+        return v;
+    }
     vector<int> set_list(int r){
         vector<int> a;
         int k = 1;
@@ -66,8 +76,19 @@ class DoubleArrayTrie
         for(int c : org){
             int t = old_base + c;
             int t_new = base[h] + c;
+            base[t_new] = base[t];
+            check[t_new] = h;
 
+            if(base[t] > 0){
+                for(int b : set_list(t)){
+                    check[base[t] + b] = t_new;
+                }
+                if(t == current_s)current_s = t_new;
+            }
+            base[t] = 0;
+            check[t] = 0;
         }
+        return current_s;
     }
 
     int x_check(vector<int> a){
@@ -91,4 +112,8 @@ class DoubleArrayTrie
         return a;
     }
     
+
+    //void ins_str(int r,vector<int> a,int pos){
+    //
+    //}
 };
