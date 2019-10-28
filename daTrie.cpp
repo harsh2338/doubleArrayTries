@@ -22,7 +22,7 @@ class DoubleArrayTrie
     void a_insert(int r,string s){
         vector<int> a = string_to_vec(s);
         int i = 0;
-        int t = base[r] + code(s[i]);
+        int t = base[r] + a[i];
 
         if(check[t] != 0){
             int k = check[t];
