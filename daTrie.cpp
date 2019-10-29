@@ -40,6 +40,38 @@ class DoubleArrayTrie
         
         //ins_str(r,a,pos);
     }
+        bool retrieval(string x,int *base,int *check,string tail){
+        int r=1;
+        int h=0;
+        int t;
+        string s_temp,rem_input_string="";
+        while(base[r]<0){
+            t=base[r]+x[h];
+            if(t>size||check[t]!=r){
+                return false;
+            }
+            else{
+                r=t;
+            }
+            h++;
+        }
+        if(h==strlen(x.c_str)){
+            return true;
+        }
+        else{
+            s_temp=fetch_str(base[r]);
+        }
+        for(int i=h+1;i<strlen(x.c_str);i++){
+            rem_input_string=rem_input_string+x[i];
+        }
+        if(str_cmp(rem_input_string,s_temp)==-1){
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
 
     //helper functions here
 
@@ -116,4 +148,37 @@ class DoubleArrayTrie
     //void ins_str(int r,vector<int> a,int pos){
     //
     //}
+
+    /**r-node no
+     * t-subsequent governing node no
+     * a-current input symbol
+     * K-set of keys(strings)
+    */
+    string fetch_str(int p){
+        string temp="";
+        while(tail[p]!='#'){
+            temp=temp+tail[p];
+            p++;
+        }
+        temp=temp+"#";
+        return temp;
+    }
+    int str_cmp(string x,string y){
+        if(x==y){
+            return -1;
+        }
+        else{
+            //return the length of the longest prefix of x and y
+        }
+        
+    }
+    //x=a1a2a3...anan+1
+
+
+    /*void b_insert(){
+        old_pos=base[r];
+        for(int i=1;i<=k;i++){
+
+        }
+    }*/
 };
