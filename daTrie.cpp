@@ -222,9 +222,12 @@ class DoubleArrayTrie
             return -1;
         }
         else{
-            //return the length of the longest prefix of x and y
-        }
-        
+            int n = x.length()<y.length()?x.length():y.length();
+            for(int i = 0;i < n;i++){
+                if(x[i] != y[i])return i;
+            }
+            return n;
+        } 
     }
     
     //undefined str_tail function
