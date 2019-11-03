@@ -1,6 +1,6 @@
-#include<iostream>
-#include<bits/stdc++.h>
-#include<string>
+#include <iostream>
+#include <bits/stdc++.h>
+#include <string>
 
 using namespace std;
 
@@ -8,6 +8,7 @@ class DoubleArrayTrie
 {
     int *base,*check,size;
     string tail;
+
     public:
     DoubleArrayTrie(int size_){
         size = size_;
@@ -37,10 +38,20 @@ class DoubleArrayTrie
                 modify(r,k,null,k_list);
             }
         }
-        
-        //ins_str(r,a,pos);
     }
-        bool retrieval(string x,int *base,int *check,string tail){
+
+    void b_insert(int r,string a1, string b1){
+        vector<int> a = string_to_vec(a1);
+        vector<int> b = string_to_vec(b1);
+        int old_pos;
+        old_pos = -base[r];
+
+        
+
+
+    }
+
+    bool retrieval(string x,int *base,int *check,string tail){
         int r=1;
         int h=0;
         int t;
@@ -79,6 +90,10 @@ class DoubleArrayTrie
         return c - 96;  
     }
 
+    char val(int c){
+        return c + 96;
+    }
+
     vector<int> string_to_vec(string s){
         vector<int> v;
         for(int i = 0;i < s.length();i++){
@@ -86,6 +101,15 @@ class DoubleArrayTrie
         }
         return v;
     }
+
+    string vec_to_str(vector<int> vec){
+        string str;
+        for(int i=0;i<vec.size();i++){
+            str[i] = val(vec[i]);
+        }
+        return str;
+    }
+
     vector<int> set_list(int r){
         vector<int> a;
         int k = 1;
@@ -145,9 +169,20 @@ class DoubleArrayTrie
     }
     
 
-    //void ins_str(int r,vector<int> a,int pos){
-    //
-    //}
+    void ins_str(int h,vector<int> a,int d_pos){
+        int t, pos;
+        vector<int> rem_string;
+
+        t = base[h] + a[0];
+        base[t] = -d_pos;
+        check[t] = h;
+
+        for(int i=1;i<a.size()-1;i++)
+            rem_string.push_back(a[i]);
+
+        pos = str_tail(d_pos, rem_string);
+        
+    }
 
     /**r-node no
      * t-subsequent governing node no
@@ -172,13 +207,17 @@ class DoubleArrayTrie
         }
         
     }
+
+    //undefined str_tail function
+    int str_tail(int p, vector<int> rem_string){
+        //no clue what this does, please check
+        int pos;
+        tail.insert(p, vec_to_str(rem_string));
+        if( p = pos)
+            return (pos+rem_string.size());
+        else
+            return pos;
+    }
     //x=a1a2a3...anan+1
 
-
-    /*void b_insert(){
-        old_pos=base[r];
-        for(int i=1;i<=k;i++){
-
-        }
-    }*/
 };
