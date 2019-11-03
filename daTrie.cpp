@@ -7,6 +7,7 @@ using namespace std;
 class DoubleArrayTrie
 {
     int *base,*check,size;
+    int pos;
     string tail;
 
     public:
@@ -18,13 +19,14 @@ class DoubleArrayTrie
             base[i] = 1;
             check[i] = 0;
         }
+        pos = 0;
     }
 
     void a_insert(int r,string s){
         vector<int> a = string_to_vec(s);
         int i = 0;
         int t = base[r] + a[i];
-
+        
         if(check[t] != 0){
             int k = check[t];
             vector<int> r_list = set_list(r);
@@ -38,6 +40,9 @@ class DoubleArrayTrie
                 modify(r,k,null,k_list);
             }
         }
+        else{
+            ins_str(r,a,pos);
+        }
     }
 
     void b_insert(int r,string a1, string b1){
@@ -45,7 +50,21 @@ class DoubleArrayTrie
         vector<int> b = string_to_vec(b1);
         int old_pos;
         old_pos = -base[r];
+        int k;
+        for(k = 0;a[k] == b[k];k++);
 
+        for(int i = 0;i<k;i++){
+            vector<int> temp = {a[i]};
+            base[r] = x_check(temp);
+            check[base[r] + a[i]] = r;
+            r = base[r] + a[i];
+        }
+        vector<int> v = {a[k],b[0]};
+        base[r] = x_check(v);
+        b = vector<int>(b.begin()+1,b.end());
+        ins_str(r,b,old_pos);
+        a = vector<int>(a.begin()+k+1,a.end());
+        ins_str(r,a,pos);
         
 
 
@@ -207,11 +226,11 @@ class DoubleArrayTrie
         }
         
     }
-
+    
     //undefined str_tail function
     int str_tail(int p, vector<int> rem_string){
         //no clue what this does, please check
-        int pos;
+        
         tail.insert(p, vec_to_str(rem_string));
         if( p = pos)
             return (pos+rem_string.size());
