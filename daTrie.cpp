@@ -6,11 +6,12 @@ using namespace std;
 
 class DoubleArrayTrie
 {
+    public:
     int *base, *check, size;
     int pos;
     string tail;
 
-public:
+
     DoubleArrayTrie(int size_)
     {
         size = size_;
@@ -18,20 +19,22 @@ public:
         check = new int[size];
         for (int i = 0; i < size; i++)
         {
-            base[i] = 1;
+            base[i] = 0;
             check[i] = 0;
         }
-        pos = 0;
+        base[1] = 1;
+        pos = 1;
+        tail = "";
     }
 
     void a_insert(int r, string s)
     {
         //r-current node
         //s-remaing part of input string
+        cout<<"a_insert"<<endl;
         vector<int> a = string_to_vec(s);
         int i = 0;
         int t = base[r] + a[i];
-
         if (check[t] != 0)
         {
             int k = check[t];
@@ -56,13 +59,14 @@ public:
 
     void b_insert(int r, string a1, string b1)
     {
+        cout<<"b_insert"<<endl;
+        cout<<a1<<endl;
         vector<int> a = string_to_vec(a1);
         vector<int> b = string_to_vec(b1);
         int old_pos;
         old_pos = -base[r];
         int k;
-        for (k = 0; a[k] == b[k]; k++)
-            ;
+        for (k = 0; a[k] == b[k]; k++);
 
         for (int i = 0; i < k; i++)
         {
@@ -73,9 +77,11 @@ public:
         }
         vector<int> v = {a[k], b[0]};
         base[r] = x_check(v);
-        b = vector<int>(b.begin() + 1, b.end());
+        //b = vector<int>(b.begin() + 1, b.end());
+        cout<<vec_to_str(b)<<endl;
         ins_str(r, b, old_pos);
-        a = vector<int>(a.begin() + k + 1, a.end());
+        a = vector<int>(a.begin() + k, a.end());
+        cout<<vec_to_str(a)<<endl;
         ins_str(r, a, pos);
     }
 
@@ -85,7 +91,7 @@ public:
         int h = 0;
         int t;
         string s_temp, rem_input_string = "";
-        while (base[r] < 0)
+        while (base[r] > 0)
         {
             t = base[r] + x[h];
 
@@ -125,11 +131,13 @@ public:
 
     int code(char c)
     { //returns 'a' -> 1,'b' -> 2 etc
+        if(c == '#')return 27;
         return c - 96;
     }
 
     char val(int c)
     {
+        if(c == 27)return '#';
         return c + 96;
     }
 
@@ -148,7 +156,7 @@ public:
         string str;
         for (int i = 0; i < vec.size(); i++)
         {
-            str[i] = val(vec[i]);
+            str += val(vec[i]);
         }
         return str;
     }
@@ -173,10 +181,11 @@ public:
 
     int modify(int current_s, int h, vector<int> add, vector<int> org)
     {
+        cout<<"modify"<<endl;
         int old_base = base[h];
         vector<int> comb = combine(add, org);
         base[h] = x_check(comb);
-
+        
         for (int c : org)
         {
             int t = old_base + c;
@@ -228,17 +237,19 @@ public:
 
     void ins_str(int h, vector<int> a, int d_pos)
     {
-        int t, pos;
+        cout<<"ins_str"<<endl;
+        int t;
         vector<int> rem_string;
 
         t = base[h] + a[0];
         base[t] = -d_pos;
         check[t] = h;
 
-        for (int i = 1; i < a.size() - 1; i++)
+        for (int i = 1; i < a.size(); i++)
             rem_string.push_back(a[i]);
 
         pos = str_tail(d_pos, rem_string);
+        cout<<pos<<endl;
     }
 
     /**r-node no
@@ -248,6 +259,7 @@ public:
     */
     string fetch_str(int p)
     {
+        cout<<pos<<endl;
         string temp = "";
         while (tail[p] != '#')
         {
@@ -279,9 +291,13 @@ public:
     int str_tail(int p, vector<int> rem_string)
     {
         //no clue what this does, please check
-
-        tail.insert(p, vec_to_str(rem_string));
-        if (p = pos)
+        cout<<"str_tail"<<endl;
+        for(int i = 0;i < rem_string.size();i++){
+            if(tail.length() <= i+p-1)tail += '?';
+            tail[i+p-1] = val(rem_string[i]);
+        }
+        cout<<tail<<endl;
+        if (p == pos)
             return (pos + rem_string.size());
         else
             return pos;
@@ -289,22 +305,24 @@ public:
     //x=a1a2a3...anan+1
 
 
-void insert(string x/*, int *base, int *check, string tail*/)
+    void insert(string x/*, int *base, int *check, string tail*/)
     {
+        cout<<"insert"<<endl;
         int r = 1;
         int h = 0;
         int t;
         string s_temp, rem_input_string = "";
-        while (base[r] < 0)
+        while (base[r] > 0)
         {
-            t = base[r] + x[h];
+            t = base[r] + code(x[h]);
 
             if (t > size || check[t] != r)
             {
                 string rem;
-                for(int i=h;i<strlen(x.c_str());i++)
-                    rem[i-h]=x[i];
+                for(int i=h;i<x.length();i++)
+                    rem.push_back(x[i]);
                 a_insert(r,rem); //if the next state is not present
+                return;
             }
             else
             {
@@ -312,15 +330,15 @@ void insert(string x/*, int *base, int *check, string tail*/)
             }
             h++;
         }
-        if (h == strlen(x.c_str()))
+        if (h == x.length())
         {
             return ;
         }
         else
         {
-            s_temp = fetch_str(base[r]);
+            s_temp = fetch_str(-base[r] - 1);
         }
-        for (int i = h + 1; i < strlen(x.c_str()); i++)
+        for (int i = h; i < x.length(); i++)
         {
             rem_input_string = rem_input_string + x[i];
         }
@@ -337,5 +355,11 @@ void insert(string x/*, int *base, int *check, string tail*/)
 int main(){
     DoubleArrayTrie *dat=new DoubleArrayTrie(100);
     dat->insert("bachelor#");
-
+    dat->insert("bcs#");
+    cout<<"base  : ";
+    for(int i = 1;i < 10;i++)cout<<dat->base[i]<<" ";
+    cout<<endl;
+    cout<<"check : ";
+    for(int i = 1;i < 10;i++)cout<<dat->check[i]<<" ";
+    cout<<endl;
 }
