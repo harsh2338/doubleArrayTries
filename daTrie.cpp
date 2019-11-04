@@ -60,7 +60,7 @@ class DoubleArrayTrie
     void b_insert(int r, string a1, string b1)
     {
         cout<<"b_insert"<<endl;
-        cout<<a1<<endl;
+        cout<<r<<" "<<a1<<" "<<b1<<endl;
         vector<int> a = string_to_vec(a1);
         vector<int> b = string_to_vec(b1);
         int old_pos;
@@ -77,11 +77,9 @@ class DoubleArrayTrie
         }
         vector<int> v = {a[k], b[0]};
         base[r] = x_check(v);
-        //b = vector<int>(b.begin() + 1, b.end());
-        cout<<vec_to_str(b)<<endl;
+        cout<<base[r]<<endl;
         ins_str(r, b, old_pos);
         a = vector<int>(a.begin() + k, a.end());
-        cout<<vec_to_str(a)<<endl;
         ins_str(r, a, pos);
     }
 
@@ -210,14 +208,17 @@ class DoubleArrayTrie
 
     int x_check(vector<int> a)
     {
+        cout<<"x_check"<<endl;
+        cout<<vec_to_str(a)<<endl;
         int q = 1, j = 0;
         while (1)
         {
+            j= 0;
             for (int i : a)
-            {
-                j++;
-                if (check[q + i] != 0)
-                    break;
+            { 
+                if (check[q + i] == 0)
+                    j++;
+                
             }
             if (j == a.size())
                 return q;
@@ -356,6 +357,7 @@ int main(){
     DoubleArrayTrie *dat=new DoubleArrayTrie(100);
     dat->insert("bachelor#");
     dat->insert("bcs#");
+    dat->insert("badge#");
     cout<<"base  : ";
     for(int i = 1;i < 10;i++)cout<<dat->base[i]<<" ";
     cout<<endl;
