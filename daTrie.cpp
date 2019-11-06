@@ -358,10 +358,12 @@ int main(){
     dat->insert("bachelor#");
     dat->insert("bcs#");
     dat->insert("badge#");
+    dat->insert("baby#");
     cout<<"base  : ";
     for(int i = 1;i < 10;i++)cout<<dat->base[i]<<" ";
     cout<<endl;
     cout<<"check : ";
     for(int i = 1;i < 10;i++)cout<<dat->check[i]<<" ";
     cout<<endl;
+
 }
