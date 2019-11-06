@@ -1,6 +1,8 @@
 #include <iostream>
 #include <bits/stdc++.h>
 #include <string> 
+#include<fstream>
+#include<time.h>
 
 using namespace std;
 
@@ -338,24 +340,40 @@ class DoubleArrayTrie
     }
 };
 int main(){
-    DoubleArrayTrie *dat=new DoubleArrayTrie(100);
-    dat->insert("bachelor#");
-    dat->insert("bcs#");
-    dat->insert("badge#");
-    cout<<dat->retrieval("bachelor#")<<endl;
-    dat->insert("baby#");
-    dat->insert("cards#");
-    cout<<dat->retrieval("badge#")<<endl;
-    cout<<dat->retrieval("baby#")<<endl;
-    cout<<dat->retrieval("bcs#")<<endl;
-    cout<<dat->retrieval("cards#")<<endl;
-    cout<<dat->retrieval("bache#")<<endl;
+    DoubleArrayTrie *dat=new DoubleArrayTrie(200);
+    ifstream file;
+    string line;
+    vector<string> words;
+    file.open("google-10000-english.txt");
+    clock_t start = clock(); 
+    if(file.is_open()){
+        while (getline(file, line) && words.size() < 15) {
+            line += "#";
+            dat->insert(line);
+            words.push_back(line);
+            if(words.size()%100 == 0)
+                cout<<"Words inserted : "<<words.size()<<endl;
+        }   
+    }
     
+    start = clock() - start;
+    double time_taken = ((double)start/CLOCKS_PER_SEC);
+    int n_correct = 0;
+    clock_t end = clock();
+    for(string s : words){
+        n_correct += dat->retrieval(s);
+    }
+    end = clock() - end;
+    double time_ret = ((double)end/CLOCKS_PER_SEC);
+    int acc = n_correct/words.size()*100;
+    cout<<"accuracy : "<<acc<<endl;
+    cout<<"Time taken to insert : "<<time_taken<<endl;
+    cout<<"Time taken to retrieval : "<<time_ret<<endl;
     cout<<"base  : ";
     for(int i = 1;i < 10;i++)cout<<dat->base[i]<<" ";
     cout<<endl;
     cout<<"check : ";
     for(int i = 1;i < 10;i++)cout<<dat->check[i]<<" ";
     cout<<endl;
-    cout<<"tail : "<<dat->tail<<endl;
+    //cout<<"tail : "<<dat->tail<<endl;
 }
