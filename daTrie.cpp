@@ -1,13 +1,15 @@
 #include <iostream>
 #include <bits/stdc++.h>
-#include <string>
+#include <string> 
+#include<fstream>
+#include<time.h>
 
 using namespace std;
 
 class DoubleArrayTrie
 {
     public:
-    int *base, *check, size;
+    int *base, *check, size;    
     int pos;
     string tail;
 
@@ -31,7 +33,6 @@ class DoubleArrayTrie
     {
         //r-current node
         //s-remaing part of input string
-        cout<<"a_insert"<<endl;
         vector<int> a = string_to_vec(s);
         int i = 0;
         int t = base[r] + a[i];
@@ -51,16 +52,11 @@ class DoubleArrayTrie
                 r=modify(r, k, null, k_list);
             }
         }
-        else
-        {
-            ins_str(r, a, pos);
-        }
+        ins_str(r, a, pos);
     }
 
     void b_insert(int r, string a1, string b1)
     {
-        cout<<"b_insert"<<endl;
-        cout<<r<<" "<<a1<<" "<<b1<<endl;
         vector<int> a = string_to_vec(a1);
         vector<int> b = string_to_vec(b1);
         int old_pos;
@@ -77,13 +73,12 @@ class DoubleArrayTrie
         }
         vector<int> v = {a[k], b[0]};
         base[r] = x_check(v);
-        cout<<base[r]<<endl;
         ins_str(r, b, old_pos);
         a = vector<int>(a.begin() + k, a.end());
         ins_str(r, a, pos);
     }
 
-    bool retrieval(string x, int *base, int *check, string tail)
+    bool retrieval(string x)
     {
         int r = 1;
         int h = 0;
@@ -91,7 +86,7 @@ class DoubleArrayTrie
         string s_temp, rem_input_string = "";
         while (base[r] > 0)
         {
-            t = base[r] + x[h];
+            t = base[r] + code(x[h]);
 
             if (t > size || check[t] != r)
             {
@@ -109,9 +104,9 @@ class DoubleArrayTrie
         }
         else
         {
-            s_temp = fetch_str(base[r]);
+            s_temp = fetch_str(-base[r] - 1);
         }
-        for (int i = h + 1; i < strlen(x.c_str()); i++)
+        for (int i = h; i < strlen(x.c_str()); i++)
         {
             rem_input_string = rem_input_string + x[i];
         }
@@ -179,7 +174,6 @@ class DoubleArrayTrie
 
     int modify(int current_s, int h, vector<int> add, vector<int> org)
     {
-        cout<<"modify"<<endl;
         int old_base = base[h];
         vector<int> comb = combine(add, org);
         base[h] = x_check(comb);
@@ -208,8 +202,6 @@ class DoubleArrayTrie
 
     int x_check(vector<int> a)
     {
-        cout<<"x_check"<<endl;
-        cout<<vec_to_str(a)<<endl;
         int q = 1, j = 0;
         while (1)
         {
@@ -238,7 +230,6 @@ class DoubleArrayTrie
 
     void ins_str(int h, vector<int> a, int d_pos)
     {
-        cout<<"ins_str"<<endl;
         int t;
         vector<int> rem_string;
 
@@ -250,7 +241,6 @@ class DoubleArrayTrie
             rem_string.push_back(a[i]);
 
         pos = str_tail(d_pos, rem_string);
-        cout<<pos<<endl;
     }
 
     /**r-node no
@@ -260,7 +250,6 @@ class DoubleArrayTrie
     */
     string fetch_str(int p)
     {
-        cout<<pos<<endl;
         string temp = "";
         while (tail[p] != '#')
         {
@@ -292,12 +281,10 @@ class DoubleArrayTrie
     int str_tail(int p, vector<int> rem_string)
     {
         //no clue what this does, please check
-        cout<<"str_tail"<<endl;
         for(int i = 0;i < rem_string.size();i++){
             if(tail.length() <= i+p-1)tail += '?';
             tail[i+p-1] = val(rem_string[i]);
         }
-        cout<<tail<<endl;
         if (p == pos)
             return (pos + rem_string.size());
         else
@@ -308,7 +295,6 @@ class DoubleArrayTrie
 
     void insert(string x/*, int *base, int *check, string tail*/)
     {
-        cout<<"insert"<<endl;
         int r = 1;
         int h = 0;
         int t;
@@ -354,14 +340,40 @@ class DoubleArrayTrie
     }
 };
 int main(){
-    DoubleArrayTrie *dat=new DoubleArrayTrie(100);
-    dat->insert("bachelor#");
-    dat->insert("bcs#");
-    dat->insert("badge#");
+    DoubleArrayTrie *dat=new DoubleArrayTrie(200);
+    ifstream file;
+    string line;
+    vector<string> words;
+    file.open("google-10000-english.txt");
+    clock_t start = clock(); 
+    if(file.is_open()){
+        while (getline(file, line) && words.size() < 15) {
+            line += "#";
+            dat->insert(line);
+            words.push_back(line);
+            if(words.size()%100 == 0)
+                cout<<"Words inserted : "<<words.size()<<endl;
+        }   
+    }
+    
+    start = clock() - start;
+    double time_taken = ((double)start/CLOCKS_PER_SEC);
+    int n_correct = 0;
+    clock_t end = clock();
+    for(string s : words){
+        n_correct += dat->retrieval(s);
+    }
+    end = clock() - end;
+    double time_ret = ((double)end/CLOCKS_PER_SEC);
+    int acc = n_correct/words.size()*100;
+    cout<<"accuracy : "<<acc<<endl;
+    cout<<"Time taken to insert : "<<time_taken<<endl;
+    cout<<"Time taken to retrieval : "<<time_ret<<endl;
     cout<<"base  : ";
     for(int i = 1;i < 10;i++)cout<<dat->base[i]<<" ";
     cout<<endl;
     cout<<"check : ";
     for(int i = 1;i < 10;i++)cout<<dat->check[i]<<" ";
     cout<<endl;
+    //cout<<"tail : "<<dat->tail<<endl;
 }
