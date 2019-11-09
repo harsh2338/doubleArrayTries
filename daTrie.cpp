@@ -1,23 +1,27 @@
+ 
 #include <iostream>
 #include <bits/stdc++.h>
-#include <string>
+#include <string> 
+#include<fstream>
+#include<time.h>
 
 using namespace std;
 
 class DoubleArrayTrie
 {
     public:
-    int *base, *check, size;
-    int pos;
+    long *base, *check;
+    long size;    
+    long pos;
     string tail;
 
 
-    DoubleArrayTrie(int size_)
+    DoubleArrayTrie(long size_)
     {
         size = size_;
-        base = new int[size];
-        check = new int[size];
-        for (int i = 0; i < size; i++)
+        base = new long[size];
+        check = new long[size];
+        for (long i = 0; i < size; i++)
         {
             base[i] = 0;
             check[i] = 0;
@@ -27,19 +31,18 @@ class DoubleArrayTrie
         tail = "";
     }
 
-    void a_insert(int r, string s)
+    void a_insert(long r, string s)
     {
         //r-current node
         //s-remaing part of input string
-        cout<<"a_insert"<<endl;
-        vector<int> a = string_to_vec(s);
-        int i = 0;
-        int t = base[r] + a[i];
+        vector<long> a = string_to_vec(s);
+        long i = 0;
+        long t = base[r] + a[i];
         if (check[t] != 0)
         {
-            int k = check[t];
-            vector<int> r_list = set_list(r);
-            vector<int> k_list = set_list(k);
+            long k = check[t];
+            vector<long> r_list = set_list(r);
+            vector<long> k_list = set_list(k);
 
             if (r_list.size() + 1 < k_list.size())
             {
@@ -47,51 +50,45 @@ class DoubleArrayTrie
             }
             else
             {
-                vector<int> null;
+                vector<long> null;
                 r=modify(r, k, null, k_list);
             }
         }
-        else
-        {
-            ins_str(r, a, pos);
-        }
+        ins_str(r, a, pos);
     }
 
-    void b_insert(int r, string a1, string b1)
+    void b_insert(long r, string a1, string b1)
     {
-        cout<<"b_insert"<<endl;
-        cout<<r<<" "<<a1<<" "<<b1<<endl;
-        vector<int> a = string_to_vec(a1);
-        vector<int> b = string_to_vec(b1);
-        int old_pos;
+        vector<long> a = string_to_vec(a1);
+        vector<long> b = string_to_vec(b1);
+        long old_pos;
         old_pos = -base[r];
-        int k;
+        long k;
         for (k = 0; a[k] == b[k]; k++);
 
-        for (int i = 0; i < k; i++)
+        for (long i = 0; i < k; i++)
         {
-            vector<int> temp = {a[i]};
+            vector<long> temp = {a[i]};
             base[r] = x_check(temp);
             check[base[r] + a[i]] = r;
             r = base[r] + a[i];
         }
-        vector<int> v = {a[k], b[0]};
+        vector<long> v = {a[k], b[0]};
         base[r] = x_check(v);
-        cout<<base[r]<<endl;
         ins_str(r, b, old_pos);
-        a = vector<int>(a.begin() + k, a.end());
+        a = vector<long>(a.begin() + k, a.end());
         ins_str(r, a, pos);
     }
 
-    bool retrieval(string x, int *base, int *check, string tail)
+    bool retrieval(string x)
     {
-        int r = 1;
-        int h = 0;
-        int t;
+        long r = 1;
+        long h = 0;
+        long t;
         string s_temp, rem_input_string = "";
         while (base[r] > 0)
         {
-            t = base[r] + x[h];
+            t = base[r] + code(x[h]);
 
             if (t > size || check[t] != r)
             {
@@ -109,9 +106,9 @@ class DoubleArrayTrie
         }
         else
         {
-            s_temp = fetch_str(base[r]);
+            s_temp = fetch_str(-base[r] - 1);
         }
-        for (int i = h + 1; i < strlen(x.c_str()); i++)
+        for (long i = h; i < strlen(x.c_str()); i++)
         {
             rem_input_string = rem_input_string + x[i];
         }
@@ -127,43 +124,43 @@ class DoubleArrayTrie
 
     //helper functions here
 
-    int code(char c)
+    long code(char c)
     { //returns 'a' -> 1,'b' -> 2 etc
         if(c == '#')return 27;
         return c - 96;
     }
 
-    char val(int c)
+    char val(long c)
     {
         if(c == 27)return '#';
         return c + 96;
     }
 
-    vector<int> string_to_vec(string s)
+    vector<long> string_to_vec(string s)
     {
-        vector<int> v;
-        for (int i = 0; i < s.length(); i++)
+        vector<long> v;
+        for (long i = 0; i < s.length(); i++)
         {
             v.push_back(code(s[i]));
         }
         return v;
     }
 
-    string vec_to_str(vector<int> vec)
+    string vec_to_str(vector<long> vec)
     {
         string str;
-        for (int i = 0; i < vec.size(); i++)
+        for (long i = 0; i < vec.size(); i++)
         {
             str += val(vec[i]);
         }
         return str;
     }
 
-    vector<int> set_list(int r)//returns a set of symbols a such that check[base[r] + i] == r
+    vector<long> set_list(long r)//returns a set of symbols a such that check[base[r] + i] == r
     {
-        vector<int> a;
-        int k = 1;
-        for (int i = 1; i < 27; i++)
+        vector<long> a;
+        long k = 1;
+        for (long i = 1; i < 27; i++)
         {
 
             if (base[r] + i >= size)
@@ -177,23 +174,22 @@ class DoubleArrayTrie
         return a;
     }
 
-    int modify(int current_s, int h, vector<int> add, vector<int> org)
+    long modify(long current_s, long h, vector<long> add, vector<long> org)
     {
-        cout<<"modify"<<endl;
-        int old_base = base[h];
-        vector<int> comb = combine(add, org);
+        long old_base = base[h];
+        vector<long> comb = combine(add, org);
         base[h] = x_check(comb);
         
-        for (int c : org)
+        for (long c : org)
         {
-            int t = old_base + c;
-            int t_new = base[h] + c;
+            long t = old_base + c;
+            long t_new = base[h] + c;
             base[t_new] = base[t];
             check[t_new] = h;
 
             if (base[t] > 0)
             {
-                for (int b : set_list(t))
+                for (long b : set_list(t))
                 {
                     check[base[t] + b] = t_new;
                 }
@@ -206,15 +202,13 @@ class DoubleArrayTrie
         return current_s;
     }
 
-    int x_check(vector<int> a)
+    long x_check(vector<long> a)
     {
-        cout<<"x_check"<<endl;
-        cout<<vec_to_str(a)<<endl;
-        int q = 1, j = 0;
+        long q = 1, j = 0;
         while (1)
         {
             j= 0;
-            for (int i : a)
+            for (long i : a)
             { 
                 if (check[q + i] == 0)
                     j++;
@@ -226,31 +220,29 @@ class DoubleArrayTrie
         }
     }
 
-    vector<int> combine(vector<int> add, vector<int> org)
+    vector<long> combine(vector<long> add, vector<long> org)
     {
-        vector<int> a;
-        for (int i : add)
+        vector<long> a;
+        for (long i : add)
             a.push_back(i);
-        for (int i : org)
+        for (long i : org)
             a.push_back(i);
         return a;
     }
 
-    void ins_str(int h, vector<int> a, int d_pos)
+    void ins_str(long h, vector<long> a, long d_pos)
     {
-        cout<<"ins_str"<<endl;
-        int t;
-        vector<int> rem_string;
+        long t;
+        vector<long> rem_string;
 
         t = base[h] + a[0];
         base[t] = -d_pos;
         check[t] = h;
 
-        for (int i = 1; i < a.size(); i++)
+        for (long i = 1; i < a.size(); i++)
             rem_string.push_back(a[i]);
 
         pos = str_tail(d_pos, rem_string);
-        cout<<pos<<endl;
     }
 
     /**r-node no
@@ -258,9 +250,8 @@ class DoubleArrayTrie
      * a-current input symbol
      * K-set of keys(strings)
     */
-    string fetch_str(int p)
+    string fetch_str(long p)
     {
-        cout<<pos<<endl;
         string temp = "";
         while (tail[p] != '#')
         {
@@ -270,7 +261,7 @@ class DoubleArrayTrie
         temp = temp + "#";
         return temp;
     }
-    int str_cmp(string x, string y)
+    long str_cmp(string x, string y)
     {
         if (x == y)
         {
@@ -278,8 +269,8 @@ class DoubleArrayTrie
         }
         else
         {
-            int n = x.length() < y.length() ? x.length() : y.length();
-            for (int i = 0; i < n; i++)
+            long n = x.length() < y.length() ? x.length() : y.length();
+            for (long i = 0; i < n; i++)
             {
                 if (x[i] != y[i])
                     return i;
@@ -289,15 +280,13 @@ class DoubleArrayTrie
     }
 
     //undefined str_tail function
-    int str_tail(int p, vector<int> rem_string)
+    long str_tail(long p, vector<long> rem_string)
     {
         //no clue what this does, please check
-        cout<<"str_tail"<<endl;
-        for(int i = 0;i < rem_string.size();i++){
+        for(long i = 0;i < rem_string.size();i++){
             if(tail.length() <= i+p-1)tail += '?';
             tail[i+p-1] = val(rem_string[i]);
         }
-        cout<<tail<<endl;
         if (p == pos)
             return (pos + rem_string.size());
         else
@@ -306,12 +295,11 @@ class DoubleArrayTrie
     //x=a1a2a3...anan+1
 
 
-    void insert(string x/*, int *base, int *check, string tail*/)
+    void insert(string x/*, long *base, long *check, string tail*/)
     {
-        cout<<"insert"<<endl;
-        int r = 1;
-        int h = 0;
-        int t;
+        long r = 1;
+        long h = 0;
+        long t;
         string s_temp, rem_input_string = "";
         while (base[r] > 0)
         {
@@ -320,7 +308,7 @@ class DoubleArrayTrie
             if (t > size || check[t] != r)
             {
                 string rem;
-                for(int i=h;i<x.length();i++)
+                for(long i=h;i<x.length();i++)
                     rem.push_back(x[i]);
                 a_insert(r,rem); //if the next state is not present
                 return;
@@ -339,7 +327,7 @@ class DoubleArrayTrie
         {
             s_temp = fetch_str(-base[r] - 1);
         }
-        for (int i = h; i < x.length(); i++)
+        for (long i = h; i < x.length(); i++)
         {
             rem_input_string = rem_input_string + x[i];
         }
@@ -353,17 +341,45 @@ class DoubleArrayTrie
         }
     }
 };
-int main(){
-    DoubleArrayTrie *dat=new DoubleArrayTrie(100);
-    dat->insert("bachelor#");
-    dat->insert("bcs#");
-    dat->insert("badge#");
-    dat->insert("baby#");
+long main(){
+    DoubleArrayTrie *dat=new DoubleArrayTrie(30000);
+    ifstream file;
+    string line;
+    vector<string> words;
+    file.open("google-10000-english.txt");
+    clock_t start = clock(); 
+    if(file.is_open()){
+        while (getline(file, line) && words.size() < 4000) {
+            line += "#";
+            dat->insert(line);
+            words.push_back(line);
+            if(words.size() == 150)
+                cout<<"Words inserted : "<<words.size()<<endl;
+        }   
+    }
+    
+    start = clock() - start;
+    double time_taken = ((double)start/CLOCKS_PER_SEC);
+    long n_correct = 0;
+    clock_t end = clock();
+    for(string s : words){
+        if(!dat->retrieval(s)){
+            dat->insert(s);
+        }
+        n_correct += dat->retrieval(s);
+        
+    }
+    end = clock() - end;
+    double time_ret = ((double)end/CLOCKS_PER_SEC);
+    double acc = (double)n_correct/words.size()*100.0;
+    cout<<"accuracy : "<<acc<<endl;
+    cout<<"Time taken to insert : "<<time_taken<<endl;
+    cout<<"Time taken to retrieval : "<<time_ret<<endl;
     cout<<"base  : ";
-    for(int i = 1;i < 10;i++)cout<<dat->base[i]<<" ";
+    for(long i = 1;i < 10;i++)cout<<dat->base[i]<<" ";
     cout<<endl;
     cout<<"check : ";
-    for(int i = 1;i < 10;i++)cout<<dat->check[i]<<" ";
+    for(long i = 1;i < 10;i++)cout<<dat->check[i]<<" ";
     cout<<endl;
-
+    //cout<<"tail : "<<dat->tail<<endl;
 }
