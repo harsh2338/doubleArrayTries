@@ -10,7 +10,7 @@ class DoubleArrayTrie
     public:
     int *base, *check, size;    
     int pos;
-    string tail;
+    vector<char> tail;
 
 
     DoubleArrayTrie(int size_)
@@ -25,7 +25,7 @@ class DoubleArrayTrie
         }
         base[1] = 1;
         pos = 1;
-        tail = "";
+        
     }
 
     void a_insert(int r, string s)
@@ -159,7 +159,7 @@ class DoubleArrayTrie
     {
         vector<int> a;
         int k = 1;
-        for (int i = 1; i < 27; i++)
+        for (int i = 1; i < 28; i++)
         {
 
             if (base[r] + i >= size)
@@ -281,11 +281,13 @@ class DoubleArrayTrie
     //undefined str_tail function
     int str_tail(int p, vector<int> rem_string)
     {
-        //no clue what this does, please check
+        
         for(int i = 0;i < rem_string.size();i++){
-            if(tail.length() <= i+p-1)tail += '?';
+            if(tail.size() <= i+p-1)tail.push_back('?');
             tail[i+p-1] = val(rem_string[i]);
         }
+        if(p+rem_string.size() > pos)
+            return p+rem_string.size();
         if (p == pos)
             return (pos + rem_string.size());
         else
@@ -346,113 +348,4 @@ class DoubleArrayTrie
             return 2;
         }
     }
-    bool deletion(string x){
-        int r = 1;
-        int h = 0;
-        int t;
-        string s_temp, rem_input_string = "";
-        while (base[r] > 0)
-        {
-            t = base[r] + code(x[h]);
-
-            if (t > size || check[t] != r)
-            {
-                return false; //if the next state is not present
-            }
-            else
-            {
-                r = t;
-            }
-            h++;
-        }
-        if (h == strlen(x.c_str()))
-        {
-            base[r] = 0;check[r] = 0;
-            return true;
-        }
-        else
-        {
-            s_temp = fetch_str(-base[r] - 1);
-        }
-        for (int i = h; i < strlen(x.c_str()); i++)
-        {
-            rem_input_string = rem_input_string + x[i];
-        }
-        if (str_cmp(rem_input_string, s_temp) == -1)
-        {
-            base[r] = 0; check[r] = 0;
-            return true;
-        }
-        else
-        {
-            return false; //if the multinode is not same as the remaining part of the string
-        }
-    }
-};/*
-int main(){
-    int size = 30000;
-    DoubleArrayTrie *dat=new DoubleArrayTrie(size);
-    DoubleArrayTrie *dat2=new DoubleArrayTrie(2000);
-    ifstream file;
-    string line;
-    long tot_chars = 0;
-    long stored_chars = 0;
-    int n_correct = 0;
-    vector<string> words,missed;
-    file.open("google-10000-english.txt");
-
-    clock_t start = clock(); 
-    if(file.is_open()){
-        while (getline(file, line) && words.size() < 10000) {
-            int count = 0;
-            line += "#";
-            int m = dat->insert(line);
-            
-            words.push_back(line);
-            if(words.size()%100 == 0)
-                cout<<"Words inserted : "<<words.size()<<endl;
-        }   
-    }
-    
-    start = clock() - start;
-    double time_taken = ((double)start/CLOCKS_PER_SEC);
-    
-    clock_t end = clock();
-
-    for(string s : words){
-        int r = dat->retrieval(s);
-        if(r == 0)dat->insert(s);
-    }
-
-    for(string s : words){
-        int r = dat->retrieval(s);
-        if(r == 0)missed.push_back(s);
-        tot_chars += s.length();
-        n_correct += r;
-    }
-    
-    end = clock() - end;
-    double time_ret = ((double)end/CLOCKS_PER_SEC);
-    double acc = n_correct/(double)words.size()*100;
-    
-    cout<<"\naccuracy : "<<acc<<endl;
-    cout<<"Time taken to insert : "<<time_taken<<"s"<<endl;
-    cout<<"Time taken to retrieval : "<<time_ret<<"s"<<endl;
-    cout<<"max base  : "<<*max_element(dat->base,dat->base+size)<<endl;
-    cout<<"min base  : "<<*min_element(dat->base,dat->base+size)<<endl;
-    cout<<"max check  : "<<*max_element(dat->check,dat->check+size)<<endl;
-    cout<<"min check  : "<<*min_element(dat->check+1,dat->check+size)<<endl;
-
-    cout<<"base : ";
-    for(int i = 1;i < 30;i++)cout<<dat->base[i]<<" ";
-    cout<<endl;
-    cout<<"check : ";
-    for(int i = 1;i < 45;i++)cout<<dat->check[i]<<" ";
-    cout<<endl;
-    //cout<<"tail : "<<dat->tail<<endl;
-    cout<<"Total chars : "<<tot_chars<<endl;
-    stored_chars += 2*size + dat->tail.length();
-    cout<<"Stored chars : "<<stored_chars<<endl;
-
-}
-*/
+};

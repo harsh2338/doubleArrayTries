@@ -82,50 +82,54 @@ int main(){
     cout<<endl;
     //cout<<"tail : "<<dat->tail<<endl;
     cout<<"Total chars : "<<tot_chars<<endl;
-    stored_chars += 2*size + dat->tail.length();
+    stored_chars += 2*size + dat->tail.size();
     cout<<"Stored chars : "<<stored_chars<<endl;
-*/
+    cout<<"TWAIL";
 
-    /*
-    FOR STORING INTO ARRAY
-    ofstream myfile0 ("base1.txt");
+    //FOR STORING INTO ARRAY
+    ofstream myfile0 ("base.txt");
     if (myfile0.is_open())
     {
         for(int count = 0; count < size; count ++){
-            myfile0 << to_string(e[count]) <<"\n" ;
+            myfile0 << to_string(dat->base[count]) <<"\n" ;
         }
         cout<<"Base done";
         myfile0.close();
     }
     else cout << "Unable to open file";
-    ofstream myfile1 ("check1.txt");
+    ofstream myfile1 ("check.txt");
     if (myfile1.is_open())
     {
         for(int count = 0; count < size; count ++){
-            myfile1 << to_string(k[count]) <<"\n" ;
+            myfile1 << to_string(dat->check[count]) <<"\n" ;
         }
         cout<<"Done";
         myfile1.close();
     }
     else cout << "Unable to open file";
-    ofstream myfile ("tail.txt");
+    ofstream myfile ("tail");
     if (myfile.is_open())
     {
-        myfile<<dat->tail;
+        for(int i=0;i<dat->tail.size();i++)
+        myfile<<dat->tail[i];
         cout<<"tail done";
         myfile.close();
     }
-    else cout << "Unable to open file";*/
+    else cout << "Unable to open file";
    
-
+*/
 
     
     //FOR RETRIEVING FROM ARRAY
     ifstream inputFile("base.txt"),inputFile1("check.txt"),inputFile2("tail.txt");
+    
     if (inputFile2.good()) {
-        int current_number;
         int i=0;
-        inputFile2>>dat->tail;
+        char ch;
+        for(int i=0;i<28317;i++){
+            inputFile2>>ch;
+            dat->tail.push_back(ch);
+        }
         inputFile2.close();
     }
     else {
@@ -160,11 +164,9 @@ int main(){
         exit(0);
     }
     
-
-
     Application *app=new Application();
     string word;
-    cout<<"Enter name of input file";
+    cout<<"Enter name of input file\n";
     cin>>app->filename;
     app->inputFile.open(app->filename.c_str()); 
     app->outputFile.open("misspelt.txt",std::fstream::in | std::fstream::out | std::fstream::app);
@@ -173,8 +175,7 @@ int main(){
        word=app->processWord(word);
         word=word+"#";
         if(!dat->retrieval(word)){
-            cout<<word;
-            app->outputFile<<word; 
+            app->outputFile<<word<<"\n"; 
         }
         word="";
     } 
