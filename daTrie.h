@@ -1,15 +1,16 @@
 #include <iostream>
 #include <bits/stdc++.h>
 #include <string> 
+#include<fstream>
+#include<time.h>
 
 using namespace std;
-
 class DoubleArrayTrie
 {
     public:
     int *base, *check, size;    
     int pos;
-    string tail;
+    vector<char> tail;
 
 
     DoubleArrayTrie(int size_)
@@ -24,7 +25,7 @@ class DoubleArrayTrie
         }
         base[1] = 1;
         pos = 1;
-        tail = "";
+        
     }
 
     void a_insert(int r, string s)
@@ -53,27 +54,28 @@ class DoubleArrayTrie
         ins_str(r, a, pos);
     }
 
-    void b_insert(int r, string a1, string b1)
+    void b_insert(int r, string a1,string ak1, string b1)
     {
         vector<int> a = string_to_vec(a1);
         vector<int> b = string_to_vec(b1);
+        vector<int> ak = string_to_vec(ak1);
         int old_pos;
         old_pos = -base[r];
-        int k;
-        for (k = 0; a[k] == b[k]; k++);
-
-        for (int i = 0; i < k; i++)
+       
+        for (int i = 0; i < a.size(); i++)
         {
+            
             vector<int> temp = {a[i]};
             base[r] = x_check(temp);
             check[base[r] + a[i]] = r;
             r = base[r] + a[i];
         }
-        vector<int> v = {a[k], b[0]};
+        vector<int> v = {ak[0], b[0]};
         base[r] = x_check(v);
+       // b = vector<int>(b.begin(),b.end());
         ins_str(r, b, old_pos);
-        a = vector<int>(a.begin() + k, a.end());
-        ins_str(r, a, pos);
+       // a = vector<int>(ak.begin()+1, ak.end());
+        ins_str(r, ak, pos);
     }
 
     bool retrieval(string x)
@@ -84,6 +86,7 @@ class DoubleArrayTrie
         string s_temp, rem_input_string = "";
         while (base[r] > 0)
         {
+            if(x[h] == '#')return true;
             t = base[r] + code(x[h]);
 
             if (t > size || check[t] != r)
@@ -156,7 +159,7 @@ class DoubleArrayTrie
     {
         vector<int> a;
         int k = 1;
-        for (int i = 1; i < 27; i++)
+        for (int i = 1; i < 28; i++)
         {
 
             if (base[r] + i >= size)
@@ -278,11 +281,13 @@ class DoubleArrayTrie
     //undefined str_tail function
     int str_tail(int p, vector<int> rem_string)
     {
-        //no clue what this does, please check
+        
         for(int i = 0;i < rem_string.size();i++){
-            if(tail.length() <= i+p-1)tail += '?';
+            if(tail.size() <= i+p-1)tail.push_back('?');
             tail[i+p-1] = val(rem_string[i]);
         }
+        if(p+rem_string.size() > pos)
+            return p+rem_string.size();
         if (p == pos)
             return (pos + rem_string.size());
         else
@@ -291,7 +296,7 @@ class DoubleArrayTrie
     //x=a1a2a3...anan+1
 
 
-    void insert(string x/*, int *base, int *check, string tail*/)
+    int insert(string x/*, int *base, int *check, string tail*/)
     {
         int r = 1;
         int h = 0;
@@ -299,6 +304,7 @@ class DoubleArrayTrie
         string s_temp, rem_input_string = "";
         while (base[r] > 0)
         {
+            if(x[h] == '#')return 0;
             t = base[r] + code(x[h]);
 
             if (t > size || check[t] != r)
@@ -307,7 +313,7 @@ class DoubleArrayTrie
                 for(int i=h;i<x.length();i++)
                     rem.push_back(x[i]);
                 a_insert(r,rem); //if the next state is not present
-                return;
+                return 1;
             }
             else
             {
@@ -317,7 +323,7 @@ class DoubleArrayTrie
         }
         if (h == x.length())
         {
-            return ;
+            return 0;
         }
         else
         {
@@ -325,37 +331,21 @@ class DoubleArrayTrie
         }
         for (int i = h; i < x.length(); i++)
         {
-            rem_input_string = rem_input_string + x[i];
+            rem_input_string += x[i];
         }
         if (str_cmp(rem_input_string, s_temp) == -1)
         {
-            return ;
+            return 0;
         }
         else
         {
-            b_insert(r,rem_input_string,s_temp); //if the multinode is not same as the remaining part of the string
+            int k;
+            string prefix,rem_suff,s_temp_suff;
+            for (k = 0; (rem_input_string[k] == s_temp[k]); k++)prefix+=s_temp[k];
+            for(int i = 0;i<rem_input_string.length();i++)rem_suff+= rem_input_string[k+i];
+            for(int i = 0;i<s_temp.length();i++)s_temp_suff+= s_temp[k+i];
+            b_insert(r,prefix,rem_suff,s_temp_suff); //if the multinode is not same as the remaining part of the string
+            return 2;
         }
     }
 };
-int main(){
-    DoubleArrayTrie *dat=new DoubleArrayTrie(100);
-    dat->insert("bachelor#");
-    dat->insert("bcs#");
-    dat->insert("badge#");
-    cout<<dat->retrieval("bachelor#")<<endl;
-    dat->insert("baby#");
-    dat->insert("cards#");
-    cout<<dat->retrieval("badge#")<<endl;
-    cout<<dat->retrieval("baby#")<<endl;
-    cout<<dat->retrieval("bcs#")<<endl;
-    cout<<dat->retrieval("cards#")<<endl;
-    cout<<dat->retrieval("bache#")<<endl;
-    
-    cout<<"base  : ";
-    for(int i = 1;i < 10;i++)cout<<dat->base[i]<<" ";
-    cout<<endl;
-    cout<<"check : ";
-    for(int i = 1;i < 10;i++)cout<<dat->check[i]<<" ";
-    cout<<endl;
-    cout<<"tail : "<<dat->tail<<endl;
-}
